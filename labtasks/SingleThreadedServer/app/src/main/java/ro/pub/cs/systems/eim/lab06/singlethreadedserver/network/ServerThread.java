@@ -48,19 +48,56 @@ public class ServerThread extends Thread {
         try {
             serverSocket = new ServerSocket(Constants.SERVER_PORT);
             while (isRunning) {
-                Socket socket = serverSocket.accept();
+                final Socket socket = serverSocket.accept();
                 Log.v(Constants.TAG, "Connection opened with " + socket.getInetAddress() + ":" + socket.getLocalPort());
-
-                // TODO exercise 5c
-                // simulate the fact the communication routine between the server and the client takes 3 seconds
-
-                PrintWriter printWriter = Utilities.getWriter(socket);
-                printWriter.println(serverTextEditText.getText().toString());
-                socket.close();
-                Log.v(Constants.TAG, "Connection closed");
+//
+//                // TODO exercise 5c
+//                // simulate the fact the communication routine between the server and the client takes 3 seconds
+//                try {
+//                    Thread.sleep(3000);
+//                } catch (InterruptedException e) {
+//                    Log.e(Constants.TAG, e.getMessage());
+//                    if (Constants.DEBUG) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                final PrintWriter printWriter = Utilities.getWriter(socket);
+//                printWriter.println(serverTextEditText.getText().toString());
+//                socket.close();
+//                Log.v(Constants.TAG, "Connection closed");
 
                 // TODO exercise 5d
                 // move the communication routine between the server and the client on a separate thread (each)
+                if (socket != null) {
+                    Thread thread = new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try {
+                                // TODO exercise 5c
+                                // simulate the fact the communication routine between the server and the client takes 3 seconds
+                                try {
+                                    Thread.sleep(3000);
+                                } catch (InterruptedException e) {
+                                    Log.e(Constants.TAG, e.getMessage());
+                                    if (Constants.DEBUG) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                PrintWriter printWriter = Utilities.getWriter(socket);
+                                printWriter.println(serverTextEditText.getText().toString());
+                                socket.close();
+                                Log.v(Constants.TAG, "Connection closed");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    });
+                    thread.start();
+                }
 
             }
         } catch (IOException ioException) {
